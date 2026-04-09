@@ -4,6 +4,8 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import { MetricCard } from './MetricCard'
+import Box from '@mui/material/Box'
+import { RevenueChart } from './RevenueChart'
 
 const mockData = [
   {
@@ -42,17 +44,21 @@ const mockData = [
 
 export function Dashboard() {
   return (
-    <Grid container spacing={2}>
-      {mockData.map(({ id, title, value, change, icon, format }) => (
-        <Grid key={id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-          <MetricCard
-            title={title}
-            value={format(value)}
-            change={change}
-            icon={icon}
-          />
-        </Grid>
-      ))}
-    </Grid>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Grid container spacing={2}>
+        {mockData.map(({ id, title, value, change, icon, format }) => (
+          <Grid key={id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+            <MetricCard
+              title={title}
+              value={format(value)}
+              change={change}
+              icon={icon}
+            />
+          </Grid>
+        ))}
+      </Grid>
+
+      <RevenueChart />
+    </Box>
   )
 }
