@@ -3,6 +3,7 @@ import Box from '@mui/material/Box'
 import { MetricCard } from './MetricCard'
 import { RevenueChart } from './RevenueChart'
 import { TrafficSourcesChart } from './TrafficSourcesChart'
+import { OrdersChart } from './OrdersChart'
 import { metricsData } from '../mocks'
 
 export function Dashboard() {
@@ -29,6 +30,8 @@ export function Dashboard() {
           <TrafficSourcesChart />
         </Grid>
       </Grid>
+
+      <OrdersChart />
     </Box>
   )
 }
