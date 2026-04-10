@@ -4,6 +4,8 @@ import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
 import { DataGrid } from '@mui/x-data-grid'
 import { usersData } from '../mocks'
+import { UsersFilters } from './UsersFilters'
+import { useState, useMemo } from 'react'
 
 const roleLabels = {
   admin: 'Администратор',
@@ -51,14 +53,29 @@ const columns = [
 ]
 
 export function Users() {
+  const [nameOrEmail, setNameOrEmail] = useState('')
+  const [role, setRole] = useState('all')
+  const [status, setStatus] = useState('all')
+  const filterProps = { nameOrEmail, role, status, setNameOrEmail, setRole, setStatus }
+
+  const filteredRows = useMemo(() => {
+    return usersData.filter((elem) => (
+      (elem.name.includes(nameOrEmail) ||
+      elem.email.includes(nameOrEmail)) &&
+      (role === 'all' || elem.role === role) &&
+      (status === 'all' || elem.status === status)
+    ))
+  }, [nameOrEmail, role, status])
+
   return (
     <Card variant="outlined">
       <CardContent>
         <Typography variant="body2" color="text.secondary" gutterBottom>
           Пользователи
         </Typography>
+        <UsersFilters { ...filterProps }/>
         <DataGrid
-          rows={usersData}
+          rows={filteredRows}
           columns={columns}
           initialState={{
             pagination: { paginationModel: { pageSize: 10, page: 0 } },
