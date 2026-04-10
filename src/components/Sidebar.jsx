@@ -9,7 +9,7 @@ const links = [
   { to: '/dashboard', label: 'Дашборд' },
   { to: '/analytics', label: 'Аналитика' },
   { to: '/settings',  label: 'Настройки' },
-  { to: '/user',      label: 'Пользователь' },
+  { to: '/users',      label: 'Пользователь' },
 ]
 
 export function Sidebar() {

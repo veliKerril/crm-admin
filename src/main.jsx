@@ -1,8 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { RouterProvider, createBrowserRouter, Navigate } from 'react-router'
+import { RouterProvider, createBrowserRouter } from 'react-router'
 import { Layout } from './layouts'
-import { Analytics, Dashboard, Settings, User } from './pages'
+import { Analytics, Dashboard, Settings, Users } from './pages'
 
 const router = createBrowserRouter([
   {
@@ -26,8 +26,8 @@ const router = createBrowserRouter([
         element: <Settings />
       },
       {
-        path: 'user',
-        element: <User />
+        path: 'users',
+        element: <Users />
       }
     ]
   }

@@ -60,3 +60,24 @@ export const trafficSourcesData = [
   { name: 'Реклама', value: 12 },
   { name: 'Прочее', value: 3 },
 ]
+
+export const ordersData = {
+  week: [
+    { label: 'Пн', orders: 45 },
+    { label: 'Вт', orders: 52 },
+    { label: 'Ср', orders: 48 },
+    { label: 'Чт', orders: 61 },
+    { label: 'Пт', orders: 78 },
+    { label: 'Сб', orders: 95 },
+    { label: 'Вс', orders: 82 },
+  ],
+  month: Array.from({ length: 30 }, (_, i) => ({
+    label: `${i + 1}`,
+    orders: Math.round(40 + Math.random() * 70),
+  })),
+  quarter: [
+    { label: 'Октябрь', orders: 1820 },
+    { label: 'Ноябрь', orders: 2150 },
+    { label: 'Декабрь', orders: 2640 },
+  ],
+}
