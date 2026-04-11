@@ -6,6 +6,10 @@ import { DataGrid } from '@mui/x-data-grid'
 import { usersData } from '../mocks'
 import { UsersFilters } from './UsersFilters'
 import { useState, useMemo } from 'react'
+import Button from '@mui/material/Button'
+import AddIcon from '@mui/icons-material/Add'
+import { UserFormDialog } from './UserFormDialog'
+import Box from '@mui/material/Box'
 
 const roleLabels = {
   admin: 'Администратор',
@@ -53,27 +57,62 @@ const columns = [
 ]
 
 export function Users() {
+  const [isDialogOpen, setDialogOpen] = useState(false)
+  const [users, setUsers] = useState(usersData)
   const [nameOrEmail, setNameOrEmail] = useState('')
   const [role, setRole] = useState('all')
   const [status, setStatus] = useState('all')
+
+  const handleAddClick = () => setDialogOpen(true)
+  const handleDialogClose = () => setDialogOpen(false)
+
+  const handleUserSubmit = (newUser) => {
+    const newUserWithExtraFields = {
+      ...newUser,
+      id: Math.max(...users.map(u => u.id)) + 1,
+      createdAt: new Date().toISOString(),
+      orders: 0,
+    }
+    setUsers(prev => ([...prev, newUserWithExtraFields]))
+  }
+
   const filterProps = { nameOrEmail, role, status, setNameOrEmail, setRole, setStatus }
 
   const filteredRows = useMemo(() => {
-    return usersData.filter((elem) => (
-      (elem.name.includes(nameOrEmail) ||
-      elem.email.includes(nameOrEmail)) &&
+    const query = nameOrEmail.toLowerCase()
+    return users.filter((elem) => (
+      (elem.name.toLowerCase().includes(query) ||
+      elem.email.toLowerCase().includes(query)) &&
       (role === 'all' || elem.role === role) &&
       (status === 'all' || elem.status === status)
     ))
-  }, [nameOrEmail, role, status])
+  }, [users, nameOrEmail, role, status])
 
   return (
     <Card variant="outlined">
       <CardContent>
-        <Typography variant="body2" color="text.secondary" gutterBottom>
-          Пользователи
-        </Typography>
-        <UsersFilters { ...filterProps }/>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 2,
+          }}
+        >
+          <Typography variant="body2" color="text.secondary">
+            Пользователи
+          </Typography>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<AddIcon />}
+            onClick={handleAddClick}
+          >
+            Добавить пользователя
+          </Button>
+        </Box>
+
+        <UsersFilters {...filterProps} />
         <DataGrid
           rows={filteredRows}
           columns={columns}
@@ -86,6 +125,12 @@ export function Users() {
           sx={{ height: 600, border: 0 }}
         />
       </CardContent>
+
+      <UserFormDialog
+        open={isDialogOpen}
+        onClose={handleDialogClose}
+        onSubmit={handleUserSubmit}
+      />
     </Card>
   )
 }

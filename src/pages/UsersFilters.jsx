@@ -59,7 +59,7 @@ export function UsersFilters({ nameOrEmail, role, status, setNameOrEmail, setRol
 
       <FormControl size="small" sx={{ minWidth: 180 }}>
         <InputLabel id="role-filter-label">Роль</InputLabel>
-        <Select labelId="role-filter-label" label="Роль" defaultValue="all" onChange={onChangeRole} value={role}>
+        <Select labelId="role-filter-label" label="Роль" onChange={onChangeRole} value={role}>
           <MenuItem value="all">Все</MenuItem>
           <MenuItem value="admin">Администратор</MenuItem>
           <MenuItem value="manager">Менеджер</MenuItem>
@@ -69,7 +69,7 @@ export function UsersFilters({ nameOrEmail, role, status, setNameOrEmail, setRol
 
       <FormControl size="small" sx={{ minWidth: 160 }}>
         <InputLabel id="status-filter-label">Статус</InputLabel>
-        <Select labelId="status-filter-label" label="Статус" defaultValue="all" onChange={onChangeStatus} value={status}>
+        <Select labelId="status-filter-label" label="Статус" onChange={onChangeStatus} value={status}>
           <MenuItem value="all">Все</MenuItem>
           <MenuItem value="active">Активен</MenuItem>
           <MenuItem value="inactive">Неактивен</MenuItem>
