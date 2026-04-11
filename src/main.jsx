@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { RouterProvider, createBrowserRouter } from 'react-router'
 import { Layout } from './layouts'
 import { Analytics, Dashboard, Settings, Users } from './pages'
+import { UsersProvider } from './context/UsersContext'
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>,
+    <UsersProvider>
+      <RouterProvider router={router} />
+    </UsersProvider>
+  </StrictMode>
 )

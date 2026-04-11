@@ -3,7 +3,6 @@ import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
 import { DataGrid } from '@mui/x-data-grid'
-import { usersData } from '../mocks'
 import { UsersFilters } from './UsersFilters'
 import { useState, useMemo } from 'react'
 import Button from '@mui/material/Button'
@@ -15,6 +14,7 @@ import Stack from '@mui/material/Stack'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { ConfirmDialog } from './ConfirmDialog'
+import { useUsers } from '../context/UsersContext'
 
 const roleLabels = {
   admin: 'Администратор',
@@ -88,7 +88,7 @@ const columns = [
 ]
 
 export function Users() {
-  const [users, setUsers] = useState(usersData)
+  const { users, addUser, updateUser, deleteUser } = useUsers()
   const [nameOrEmail, setNameOrEmail] = useState('')
   const [role, setRole] = useState('all')
   const [status, setStatus] = useState('all')
@@ -98,15 +98,9 @@ export function Users() {
 
   const handleUserSubmit = (newUser) => {
     if (!editingUser) {
-      const newUserWithExtraFields = {
-        ...newUser,
-        id: users.length ? Math.max(...users.map(u => u.id)) + 1 : 1,
-        createdAt: new Date().toISOString(),
-        orders: 0,
-      }
-      setUsers(prev => ([...prev, newUserWithExtraFields]))
+      addUser(newUser)
     } else {
-      setUsers(prev => prev.map(u => u.id === newUser.id ? newUser : u))
+      updateUser({ ...editingUser, ...newUser })
     }
   }
 
@@ -142,9 +136,7 @@ export function Users() {
   }
 
   const handleDeleteConfirm = () => {
-    setUsers((prev) => (
-      prev.filter(elem => elem.id !== deletingUser.id)
-    ))
+    deleteUser(deletingUser.id)
     setDeletingUser(null)
   }
 
