@@ -10,6 +10,11 @@ import Button from '@mui/material/Button'
 import AddIcon from '@mui/icons-material/Add'
 import { UserFormDialog } from './UserFormDialog'
 import Box from '@mui/material/Box'
+import IconButton from '@mui/material/IconButton'
+import Stack from '@mui/material/Stack'
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete'
+import { ConfirmDialog } from './ConfirmDialog'
 
 const roleLabels = {
   admin: 'Администратор',
@@ -54,26 +59,55 @@ const columns = [
     width: 110,
     type: 'number',
   },
+  {
+    field: 'actions',
+    headerName: 'Действия',
+    width: 120,
+    sortable: false,
+    filterable: false,
+    renderCell: (params) => (
+      <Stack direction="row" spacing={0.5}>
+        <IconButton
+          size="small"
+          onClick={() => params.row.onEdit(params.row)}
+          aria-label="Редактировать"
+        >
+          <EditIcon fontSize="small" />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="error"
+          onClick={() => params.row.onDelete(params.row)}
+          aria-label="Удалить"
+        >
+          <DeleteIcon fontSize="small" />
+        </IconButton>
+      </Stack>
+    ),
+  },
 ]
 
 export function Users() {
-  const [isDialogOpen, setDialogOpen] = useState(false)
   const [users, setUsers] = useState(usersData)
   const [nameOrEmail, setNameOrEmail] = useState('')
   const [role, setRole] = useState('all')
   const [status, setStatus] = useState('all')
-
-  const handleAddClick = () => setDialogOpen(true)
-  const handleDialogClose = () => setDialogOpen(false)
+  const [isFormOpen, setFormOpen] = useState(false)
+  const [editingUser, setEditingUser] = useState(null)
+  const [deletingUser, setDeletingUser] = useState(null)
 
   const handleUserSubmit = (newUser) => {
-    const newUserWithExtraFields = {
-      ...newUser,
-      id: Math.max(...users.map(u => u.id)) + 1,
-      createdAt: new Date().toISOString(),
-      orders: 0,
+    if (!editingUser) {
+      const newUserWithExtraFields = {
+        ...newUser,
+        id: users.length ? Math.max(...users.map(u => u.id)) + 1 : 1,
+        createdAt: new Date().toISOString(),
+        orders: 0,
+      }
+      setUsers(prev => ([...prev, newUserWithExtraFields]))
+    } else {
+      setUsers(prev => prev.map(u => u.id === newUser.id ? newUser : u))
     }
-    setUsers(prev => ([...prev, newUserWithExtraFields]))
   }
 
   const filterProps = { nameOrEmail, role, status, setNameOrEmail, setRole, setStatus }
@@ -87,6 +121,45 @@ export function Users() {
       (status === 'all' || elem.status === status)
     ))
   }, [users, nameOrEmail, role, status])
+
+  const handleAddClick = () => {
+    setEditingUser(null)
+    setFormOpen(true)
+  }
+
+  const handleEditClick = (user) => {
+    setEditingUser(user)
+    setFormOpen(true)
+  }
+
+  const handleFormClose = () => {
+    setFormOpen(false)
+    setEditingUser(null)
+  }
+
+  const handleDeleteClick = (user) => {
+    setDeletingUser(user)
+  }
+
+  const handleDeleteConfirm = () => {
+    setUsers((prev) => (
+      prev.filter(elem => elem.id !== deletingUser.id)
+    ))
+    setDeletingUser(null)
+  }
+
+  const handleDeleteCancel = () => {
+    setDeletingUser(null)
+  }
+
+
+  const rowsWithActions = useMemo(() => (
+    filteredRows.map((row) => ({
+      ...row,
+      onEdit: handleEditClick,
+      onDelete: handleDeleteClick,
+    }))
+  ), [filteredRows])
 
   return (
     <Card variant="outlined">
@@ -114,7 +187,7 @@ export function Users() {
 
         <UsersFilters {...filterProps} />
         <DataGrid
-          rows={filteredRows}
+          rows={rowsWithActions}
           columns={columns}
           initialState={{
             pagination: { paginationModel: { pageSize: 10, page: 0 } },
@@ -127,9 +200,22 @@ export function Users() {
       </CardContent>
 
       <UserFormDialog
-        open={isDialogOpen}
-        onClose={handleDialogClose}
+        open={isFormOpen}
+        onClose={handleFormClose}
         onSubmit={handleUserSubmit}
+        initialValues={editingUser}
+      />
+
+      <ConfirmDialog
+        open={Boolean(deletingUser)}
+        title="Удалить пользователя"
+        message={
+          deletingUser
+            ? `Удалить пользователя ${deletingUser.name}? Это действие нельзя отменить.`
+            : ''
+        }
+        onConfirm={handleDeleteConfirm}
+        onClose={handleDeleteCancel}
       />
     </Card>
   )

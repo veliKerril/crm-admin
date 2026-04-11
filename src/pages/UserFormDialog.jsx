@@ -9,7 +9,7 @@ import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import Button from '@mui/material/Button'
 import Box from '@mui/material/Box'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const INITIAL_FORM_STATE = {
   name: '',
@@ -23,9 +23,22 @@ const INITIAL_FORM_ERROR = {
   email: '',
 }
 
-export function UserFormDialog({ open, onClose, onSubmit }) {
+export function UserFormDialog({ open, onClose, onSubmit, initialValues = null}) {
   const [fields, setFields] = useState(INITIAL_FORM_STATE)
   const [errors, setErrors] = useState(INITIAL_FORM_ERROR)
+
+  const isEditMode = Boolean(initialValues)
+
+  useEffect(() => {
+    if (!open) return
+    if (initialValues) {
+      const { name, email, role, status } = initialValues
+      setFields({ name, email, role, status })
+    } else {
+      setFields(INITIAL_FORM_STATE)
+    }
+    setErrors(INITIAL_FORM_ERROR)
+  }, [open, initialValues])
 
   const handleSubmit = () => {
     const newErrors = { name: '', email: '' }
@@ -37,7 +50,7 @@ export function UserFormDialog({ open, onClose, onSubmit }) {
 
     if (newErrors.name || newErrors.email) return
 
-    onSubmit({ ...fields, name: fields.name.trim(), email: fields.email.trim() })
+    onSubmit({ ...initialValues, ...fields, name: fields.name.trim(), email: fields.email.trim() })
     setFields(INITIAL_FORM_STATE)
     setErrors(INITIAL_FORM_ERROR)
     onClose()
@@ -51,7 +64,9 @@ export function UserFormDialog({ open, onClose, onSubmit }) {
 
   return (
     <Dialog open={open} onClose={onCloseLocal} fullWidth maxWidth="sm">
-      <DialogTitle>Новый пользователь</DialogTitle>
+      <DialogTitle>
+        {isEditMode ? 'Редактировать пользователя' : 'Новый пользователь'}
+      </DialogTitle>
       <DialogContent>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
           <TextField
@@ -101,11 +116,8 @@ export function UserFormDialog({ open, onClose, onSubmit }) {
       </DialogContent>
       <DialogActions>
         <Button onClick={onCloseLocal}>Отмена</Button>
-        <Button
-          variant="contained"
-          onClick={ handleSubmit }
-        >
-          Сохранить
+        <Button variant="contained" onClick={handleSubmit}>
+          {isEditMode ? 'Сохранить' : 'Создать'}
         </Button>
       </DialogActions>
     </Dialog>
