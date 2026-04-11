@@ -1,32 +1,34 @@
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useContext, useCallback, useReducer } from 'react'
 import { usersData } from '../mocks'
 
 const UsersContext = createContext(null)
 
-export function UsersProvider({ children }) {
-  const [users, setUsers] = useState(usersData)
-
-  const addUser = useCallback((userData) => {
-    setUsers((prev) => {
+function usersReducer(state, action) {
+  switch (action.type) {
+    case 'add': {
       const newUser = {
-        ...userData,
+        ...action.payload,
         id: Date.now(),
         createdAt: new Date().toISOString(),
         orders: 0,
       }
-      return [...prev, newUser]
-    })
-  }, [])
+      return [...state, newUser]
+    }
+    case 'update':
+      return state.map(u => u.id === action.payload.id ? { ...u, ...action.payload } : u)
+    case 'delete':
+      return state.filter(u => u.id !== action.payload)
+    default:
+      throw new Error(`Unknown action: ${action.type}`)
+  }
+}
 
-  const updateUser = useCallback((updatedUser) => {
-    setUsers((prev) =>
-      prev.map((u) => (u.id === updatedUser.id ? { ...u, ...updatedUser } : u))
-    )
-  }, [])
+export function UsersProvider({ children }) {
+  const [users, dispatch] = useReducer(usersReducer, usersData)
 
-  const deleteUser = useCallback((id) => {
-    setUsers((prev) => prev.filter((u) => u.id !== id))
-  }, [])
+  const addUser = useCallback((userData) => dispatch({ type: 'add', payload: userData }), [])
+  const updateUser = useCallback((user) => dispatch({ type: 'update', payload: user }), [])
+  const deleteUser = useCallback((id) => dispatch({ type: 'delete', payload: id }), [])
 
   const value = { users, addUser, updateUser, deleteUser }
 
