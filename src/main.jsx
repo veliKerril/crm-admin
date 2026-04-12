@@ -4,6 +4,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router'
 import { Layout } from './layouts'
 import { Analytics, Dashboard, Settings, Users } from './pages'
 import { UsersProvider } from './context/UsersContext'
+import { SnackbarProvider } from './context/SnackbarContext'
 
 const router = createBrowserRouter([
   {
@@ -36,8 +37,10 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <UsersProvider>
-      <RouterProvider router={router} />
-    </UsersProvider>
+    <SnackbarProvider>
+      <UsersProvider>
+        <RouterProvider router={router} />
+      </UsersProvider>
+    </SnackbarProvider>
   </StrictMode>
 )
