@@ -1,3 +1,5 @@
+import CircularProgress from '@mui/material/CircularProgress'
+import Alert from '@mui/material/Alert'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
@@ -15,6 +17,8 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { ConfirmDialog } from './ConfirmDialog'
 import { useUsers } from '../context/UsersContext'
+import { useSnackbar } from '../context/SnackbarContext'
+
 
 const roleLabels = {
   admin: 'Администратор',
@@ -88,7 +92,10 @@ const columns = [
 ]
 
 export function Users() {
-  const { users, addUser, updateUser, deleteUser } = useUsers()
+  const { users, isLoading, error, addUser, updateUser, deleteUser } = useUsers()
+  const showSnackbar = useSnackbar()
+
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [nameOrEmail, setNameOrEmail] = useState('')
   const [role, setRole] = useState('all')
   const [status, setStatus] = useState('all')
@@ -96,11 +103,34 @@ export function Users() {
   const [editingUser, setEditingUser] = useState(null)
   const [deletingUser, setDeletingUser] = useState(null)
 
-  const handleUserSubmit = (newUser) => {
-    if (!editingUser) {
-      addUser(newUser)
-    } else {
-      updateUser({ ...editingUser, ...newUser })
+  const handleUserSubmit = async (formData) => {
+    setIsSubmitting(true)
+    try {
+      if (editingUser) {
+        await updateUser({ ...editingUser, ...formData })
+        showSnackbar('Пользователь обновлён', 'success')
+      } else {
+        await addUser(formData)
+        showSnackbar('Пользователь создан', 'success')
+      }
+      handleFormClose()
+    } catch (err) {
+      showSnackbar(err.message, 'error')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleDeleteConfirm = async () => {
+    setIsSubmitting(true)
+    try {
+      await deleteUser(deletingUser.id)
+      showSnackbar('Пользователь удалён', 'success')
+      setDeletingUser(null)
+    } catch (err) {
+      showSnackbar(err.message, 'error')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -135,16 +165,6 @@ export function Users() {
     setDeletingUser(user)
   }
 
-  const handleDeleteConfirm = () => {
-    deleteUser(deletingUser.id)
-    setDeletingUser(null)
-  }
-
-  const handleDeleteCancel = () => {
-    setDeletingUser(null)
-  }
-
-
   const rowsWithActions = useMemo(() => (
     filteredRows.map((row) => ({
       ...row,
@@ -152,6 +172,26 @@ export function Users() {
       onDelete: handleDeleteClick,
     }))
   ), [filteredRows])
+
+  if (isLoading) {
+    return (
+      <Card variant="outlined">
+        <CardContent sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+          <CircularProgress />
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (error) {
+    return (
+      <Card variant="outlined">
+        <CardContent>
+          <Alert severity="error">{error}</Alert>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card variant="outlined">
@@ -196,18 +236,16 @@ export function Users() {
         onClose={handleFormClose}
         onSubmit={handleUserSubmit}
         initialValues={editingUser}
+        isSubmitting={isSubmitting}
       />
 
       <ConfirmDialog
         open={Boolean(deletingUser)}
         title="Удалить пользователя"
-        message={
-          deletingUser
-            ? `Удалить пользователя ${deletingUser.name}? Это действие нельзя отменить.`
-            : ''
-        }
+        message={deletingUser ? `Удалить пользователя ${deletingUser.name}?` : ''}
         onConfirm={handleDeleteConfirm}
-        onClose={handleDeleteCancel}
+        onClose={() => !isSubmitting && setDeletingUser(null)}
+        isSubmitting={isSubmitting}
       />
     </Card>
   )

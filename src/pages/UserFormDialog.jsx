@@ -23,7 +23,7 @@ const INITIAL_FORM_ERROR = {
   email: '',
 }
 
-export function UserFormDialog({ open, onClose, onSubmit, initialValues = null}) {
+export function UserFormDialog({ open, onClose, onSubmit, initialValues = null, isSubmitting = false}) {
   const [fields, setFields] = useState(INITIAL_FORM_STATE)
   const [errors, setErrors] = useState(INITIAL_FORM_ERROR)
 
@@ -115,9 +115,9 @@ export function UserFormDialog({ open, onClose, onSubmit, initialValues = null})
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onCloseLocal}>Отмена</Button>
-        <Button variant="contained" onClick={handleSubmit}>
-          {isEditMode ? 'Сохранить' : 'Создать'}
+        <Button onClick={onCloseLocal} disabled={isSubmitting}>Отмена</Button>
+        <Button variant="contained" onClick={handleSubmit} disabled={isSubmitting}>
+          {isSubmitting ? 'Сохранение…' : (isEditMode ? 'Сохранить' : 'Создать')}
         </Button>
       </DialogActions>
     </Dialog>

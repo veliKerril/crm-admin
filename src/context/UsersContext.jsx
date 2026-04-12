@@ -1,36 +1,87 @@
-import { createContext, useContext, useCallback, useReducer } from 'react'
-import { usersData } from '../mocks'
+import { createContext, useContext, useCallback, useReducer, useEffect } from 'react'
+import { fetchUsers, createUser, updateUserApi, deleteUserApi } from '../api/usersApi'
 
 const UsersContext = createContext(null)
 
+const initialState = {
+  users: [],
+  isLoading: false,
+  error: null,
+}
+
 function usersReducer(state, action) {
   switch (action.type) {
-    case 'add': {
-      const newUser = {
-        ...action.payload,
-        id: Date.now(),
-        createdAt: new Date().toISOString(),
-        orders: 0,
+    case 'fetch_start':
+      return { ...state, isLoading: true, error: null }
+    case 'fetch_success':
+      return { ...state, isLoading: false, users: action.payload }
+    case 'fetch_error':
+      return { ...state, isLoading: false, error: action.payload }
+
+    case 'add_success':
+      return { ...state, users: [...state.users, action.payload] }
+    case 'update_success':
+      return {
+        ...state,
+        users: state.users.map((u) =>
+          u.id === action.payload.id ? action.payload : u
+        ),
       }
-      return [...state, newUser]
-    }
-    case 'update':
-      return state.map(u => u.id === action.payload.id ? { ...u, ...action.payload } : u)
-    case 'delete':
-      return state.filter(u => u.id !== action.payload)
+    case 'delete_success':
+      return {
+        ...state,
+        users: state.users.filter((u) => u.id !== action.payload),
+      }
+
     default:
       throw new Error(`Unknown action: ${action.type}`)
   }
 }
 
 export function UsersProvider({ children }) {
-  const [users, dispatch] = useReducer(usersReducer, usersData)
+  const [state, dispatch] = useReducer(usersReducer, initialState)
 
-  const addUser = useCallback((userData) => dispatch({ type: 'add', payload: userData }), [])
-  const updateUser = useCallback((user) => dispatch({ type: 'update', payload: user }), [])
-  const deleteUser = useCallback((id) => dispatch({ type: 'delete', payload: id }), [])
+  useEffect(() => {
+    let cancelled = false
+    dispatch({ type: 'fetch_start' })
+    fetchUsers()
+      .then((data) => {
+        if (!cancelled) dispatch({ type: 'fetch_success', payload: data })
+      })
+      .catch((err) => {
+        if (!cancelled) dispatch({ type: 'fetch_error', payload: err.message })
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
-  const value = { users, addUser, updateUser, deleteUser }
+  const addUser = useCallback(async (userData) => {
+    const created = await createUser(userData)
+    dispatch({ type: 'add_success', payload: created })
+    return created
+  }, [])
+
+  const updateUser = useCallback(async (user) => {
+    const updated = await updateUserApi(user)
+    dispatch({ type: 'update_success', payload: updated })
+    return updated
+  }, [])
+
+  const deleteUser = useCallback(async (id) => {
+    await deleteUserApi(id)
+    dispatch({ type: 'delete_success', payload: id })
+    return id
+  }, [])
+
+  const value = {
+    users: state.users,
+    isLoading: state.isLoading,
+    error: state.error,
+    addUser,
+    updateUser,
+    deleteUser,
+  }
 
   return <UsersContext.Provider value={value}>{children}</UsersContext.Provider>
 }

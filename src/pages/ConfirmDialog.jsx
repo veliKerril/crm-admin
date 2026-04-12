@@ -11,20 +11,16 @@ export function ConfirmDialog({
   message,
   onConfirm,
   onClose,
-  confirmLabel = 'Удалить',
-  cancelLabel = 'Отмена',
-  confirmColor = 'error',
+  isSubmitting = false,
 }) {
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog open={open} onClose={isSubmitting ? undefined : onClose} maxWidth="xs" fullWidth>
       <DialogTitle>{title}</DialogTitle>
-      <DialogContent>
-        <DialogContentText>{message}</DialogContentText>
-      </DialogContent>
+      <DialogContent><DialogContentText>{message}</DialogContentText></DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>{cancelLabel}</Button>
-        <Button onClick={onConfirm} variant="contained" color={confirmColor} autoFocus>
-          {confirmLabel}
+        <Button onClick={onClose} disabled={isSubmitting}>Отмена</Button>
+        <Button onClick={onConfirm} variant="contained" color="error" disabled={isSubmitting} autoFocus>
+          {isSubmitting ? 'Удаление…' : 'Удалить'}
         </Button>
       </DialogActions>
     </Dialog>
