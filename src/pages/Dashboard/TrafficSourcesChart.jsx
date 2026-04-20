@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography'
 import {
   PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts'
-import { trafficSourcesData } from '../mocks'
+import { trafficSourcesData } from '../../mocks'
 
 const COLORS = ['#1976d2', '#2e7d32', '#ed6c02', '#9c27b0', '#757575']
 

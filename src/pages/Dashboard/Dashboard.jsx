@@ -4,8 +4,8 @@ import { MetricCard } from './MetricCard'
 import { RevenueChart } from './RevenueChart'
 import { TrafficSourcesChart } from './TrafficSourcesChart'
 import { OrdersChart } from './OrdersChart'
-import { metricsData } from '../mocks'
-import { useUsers } from '../context/UsersContext'
+import { metricsData } from '../../mocks'
+import { useUsers } from '../../context/UsersContext'
 
 export function Dashboard() {
   const { users } = useUsers()

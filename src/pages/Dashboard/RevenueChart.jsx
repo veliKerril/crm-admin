@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
-import { revenueData } from '../mocks'
+import { revenueData } from '../../mocks'
 
 const formatRub = (v) => `${(v / 1000).toLocaleString('ru-RU')}k ₽`
 

@@ -1,6 +1,7 @@
 import { Outlet } from "react-router"
 import { Box } from '@mui/material'
-import { Header, Sidebar } from '../components'
+import { Header } from '../components/Header'
+import { Sidebar } from '../components/Sidebar'
 import Toolbar from '@mui/material/Toolbar';
 
 export function Layout() {

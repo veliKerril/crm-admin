@@ -8,7 +8,7 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
-import { ordersData } from '../mocks'
+import { ordersData } from '../../mocks'
 
 export function OrdersChart() {
   const [period, setPeriod] = useState('week')

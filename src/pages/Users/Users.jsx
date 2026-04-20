@@ -15,9 +15,9 @@ import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { ConfirmDialog } from './ConfirmDialog'
-import { useUsers } from '../context/UsersContext'
-import { useSnackbar } from '../context/SnackbarContext'
+import { ConfirmDialog } from '../../components/ConfirmDialog'
+import { useUsers } from '../../context/UsersContext'
+import { useSnackbar } from '../../context/SnackbarContext'
 
 
 const roleLabels = {
